@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Window</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-window {
+            position: absolute;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+            right: 3%;
+            bottom: 3%;
+            cursor: move;
+        }
+
+        .header {
+            background: #0078D7;
+            color: white;
+            padding: 10px;
+            cursor: grab;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content {
+            display: flex;
+            flex: 1;
+            height: 100%;
+        }
+
+        .history {
+            width: 33%;
+            height: 100%;
+            background: #e0e0e0;
+            padding: 10px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .data {
+            flex: 1;
+            height: 100%;
+            padding: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .button {
+            background: white;
+            color: #0078D7;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .open-btn {
+            display: block;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .resizable {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .resizer {
+            position: absolute;
+            background: transparent;
+        }
+
+        .resizer-right { right: 0; top: 0; width: 5px; height: 100%; cursor: ew-resize; }
+        .resizer-bottom { bottom: 0; left: 0; width: 100%; height: 5px; cursor: ns-resize; }
+        .resizer-left { left: 0; top: 0; width: 5px; height: 100%; cursor: ew-resize; }
+        .resizer-top { top: 0; left: 0; width: 100%; height: 5px; cursor: ns-resize; }
+    </style>
+</head>
+<body>
+    <button class="open-btn" onclick="openWindow()">Open Floating Window</button>
+    <div class="floating-window" id="floatingWindow">
+        <div class="header" id="header">
+            <span>Application</span>
+            <div class="buttons">
+                <button class="button" id="maximizeBtn" onclick="toggleMaximize()">□</button>
+                <button class="button" onclick="toggleHistory()">History</button>
+                <button class="button" onclick="closeWindow()">X</button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="history" id="historyPanel">
+                <h4>History</h4>
+                <ul>
+                    <li>Item 1</li>
+                    <li>Item 2</li>
+                    <li>Item 3</li>
+                </ul>
+            </div>
+            <div class="data" id="dataPanel">
+                <h4>Data</h4>
+                <p>This is some sample data content inside the floating window.</p>
+            </div>
+        </div>
+        <div class="resizable">
+            <div class="resizer resizer-right"></div>
+            <div class="resizer resizer-bottom"></div>
+            <div class="resizer resizer-left"></div>
+            <div class="resizer resizer-top"></div>
+        </div>
+    </div>
+
+    <script>
+        const windowEl = document.getElementById("floatingWindow");
+        const maximizeBtn = document.getElementById("maximizeBtn");
+        const historyPanel = document.getElementById("historyPanel");
+        let isMaximized = false;
+
+        function openWindow() {
+            windowEl.style.display = "block";
+        }
+
+        function closeWindow() {
+            windowEl.style.display = "none";
+        }
+
+        function toggleMaximize() {
+            if (isMaximized) {
+                windowEl.style.width = "350px";
+                windowEl.style.height = "450px";
+                windowEl.style.right = "3%";
+                windowEl.style.bottom = "3%";
+                maximizeBtn.textContent = "□";
+            } else {
+                windowEl.style.width = "700px";
+                windowEl.style.height = "600px";
+                windowEl.style.right = "3%";
+                windowEl.style.bottom = "3%";
+                maximizeBtn.textContent = "–";
+            }
+            isMaximized = !isMaximized;
+        }
+
+        function toggleHistory() {
+            historyPanel.style.display = historyPanel.style.display === "block" ? "none" : "block";
+        }
+
+        document.querySelectorAll('.resizer').forEach(resizer => {
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const side = e.target.classList[1].split('-')[1];
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', stopResize);
+
+                function resize(event) {
+                    if (side === 'right') {
+                        windowEl.style.width = `${event.clientX - windowEl.offsetLeft}px`;
+                    } else if (side === 'bottom') {
+                        windowEl.style.height = `${event.clientY - windowEl.offsetTop}px`;
+                    } else if (side === 'left') {
+                        windowEl.style.width = `${windowEl.offsetWidth + (windowEl.offsetLeft - event.clientX)}px`;
+                        windowEl.style.left = `${event.clientX}px`;
+                    } else if (side === 'top') {
+                        windowEl.style.height = `${windowEl.offsetHeight + (windowEl.offsetTop - event.clientY)}px`;
+                        windowEl.style.top = `${event.clientY}px`;
+                    }
+                }
+
+                function stopResize() {
+                    document.removeEventListener('mousemove', resize);
+                    document.removeEventListener('mouseup', stopResize);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
