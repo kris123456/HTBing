@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Window</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-window {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 2;
+            right: 3%;
+            bottom: 3%;
+        }
+
+        .header {
+            background: #0078D7;
+            color: white;
+            padding: 10px;
+            cursor: grab;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resize-handle {
+            position: absolute;
+            background: transparent;
+        }
+
+        .resize-right { right: 0; top: 0; width: 5px; height: 100%; cursor: ew-resize; }
+        .resize-bottom { bottom: 0; left: 0; width: 100%; height: 5px; cursor: ns-resize; }
+        .resize-left { left: 0; top: 0; width: 5px; height: 100%; cursor: ew-resize; }
+        .resize-top { top: 0; left: 0; width: 100%; height: 5px; cursor: ns-resize; }
+
+    </style>
+</head>
+<body>
+    <button class="open-btn" onclick="openWindow()">Open Floating Window</button>
+    <div class="floating-window" id="floatingWindow">
+        <div class="header" id="header">Application</div>
+        <div class="resize-handle resize-right" id="resizeRight"></div>
+        <div class="resize-handle resize-bottom" id="resizeBottom"></div>
+        <div class="resize-handle resize-left" id="resizeLeft"></div>
+        <div class="resize-handle resize-top" id="resizeTop"></div>
+    </div>
+
+    <script>
+        const windowEl = document.getElementById("floatingWindow");
+        const openBtn = document.querySelector(".open-btn");
+        let isResizing = false, resizeDirection = "";
+
+        function openWindow() {
+            windowEl.style.display = "block";
+            openBtn.style.display = "none";
+        }
+
+        document.querySelectorAll(".resize-handle").forEach(handle => {
+            handle.addEventListener("mousedown", (e) => {
+                isResizing = true;
+                resizeDirection = e.target.classList[1];
+                document.addEventListener("mousemove", resizeWindow);
+                document.addEventListener("mouseup", () => {
+                    isResizing = false;
+                    document.removeEventListener("mousemove", resizeWindow);
+                });
+            });
+        });
+
+        function resizeWindow(e) {
+            if (!isResizing) return;
+
+            let rect = windowEl.getBoundingClientRect();
+            if (resizeDirection === "resize-right") {
+                windowEl.style.width = `${e.clientX - rect.left}px`;
+            } else if (resizeDirection === "resize-bottom") {
+                windowEl.style.height = `${e.clientY - rect.top}px`;
+            } else if (resizeDirection === "resize-left") {
+                let newWidth = rect.right - e.clientX;
+                if (newWidth > 100) {
+                    windowEl.style.width = `${newWidth}px`;
+                    windowEl.style.left = `${e.clientX}px`;
+                }
+            } else if (resizeDirection === "resize-top") {
+                let newHeight = rect.bottom - e.clientY;
+                if (newHeight > 100) {
+                    windowEl.style.height = `${newHeight}px`;
+                    windowEl.style.top = `${e.clientY}px`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
