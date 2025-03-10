@@ -1,0 +1,30 @@
+<button mat-raised-button color="primary" (click)="openWindow()">Open Floating Window</button>
+
+<div *ngIf="isWindowOpen" class="floating-window" [ngClass]="{'maximized': isMaximized}">
+  <div class="header">
+    <span>Application</span>
+    <div class="buttons">
+      <button mat-icon-button (click)="toggleMaximize()">
+        <mat-icon>{{ isMaximized ? 'minimize' : 'crop_square' }}</mat-icon>
+      </button>
+      <button mat-button (click)="toggleHistory()">History</button>
+      <button mat-icon-button (click)="closeWindow()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="content">
+    <div *ngIf="isHistoryVisible" class="history">
+      <h4>History</h4>
+      <mat-list>
+        <mat-list-item *ngFor="let item of ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5']">
+          {{ item }}
+        </mat-list-item>
+      </mat-list>
+    </div>
+    <div class="data">
+      <h4>Data</h4>
+      <p>This is some sample data content inside the floating window.</p>
+    </div>
+  </div>
+</div>

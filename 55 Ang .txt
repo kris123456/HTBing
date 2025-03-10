@@ -1,0 +1,28 @@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-floating-window',
+  templateUrl: './floating-window.component.html',
+  styleUrls: ['./floating-window.component.css']
+})
+export class FloatingWindowComponent {
+  isWindowOpen = false;
+  isMaximized = false;
+  isHistoryVisible = false;
+
+  openWindow() {
+    this.isWindowOpen = true;
+  }
+
+  closeWindow() {
+    this.isWindowOpen = false;
+  }
+
+  toggleMaximize() {
+    this.isMaximized = !this.isMaximized;
+  }
+
+  toggleHistory() {
+    this.isHistoryVisible = !this.isHistoryVisible;
+  }
+}
