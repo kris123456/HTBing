@@ -1,0 +1,68 @@
+<div class="drag-container">
+  <div class="draggable-box" cdkDrag (cdkDragMoved)="constrainDrag($event)">
+    Drag Me!
+  </div>
+</div>
+.drag-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.draggable-box {
+  width: 200px;
+  height: 100px;
+  background: lightblue;
+  position: absolute;
+  cursor: grab;
+}
+import { Component, HostListener } from '@angular/core';
+import { CdkDragMove } from '@angular/cdk/drag-drop';
+
+@Component({
+  selector: 'app-draggable',
+  templateUrl: './draggable.component.html',
+  styleUrls: ['./draggable.component.css']
+})
+export class DraggableComponent {
+  screenWidth = window.innerWidth;
+  screenHeight = window.innerHeight;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.screenWidth = window.innerWidth;
+    this.screenHeight = window.innerHeight;
+  }
+
+  constrainDrag(event: CdkDragMove) {
+    const box = event.source.getRootElement();
+    const parent = box.parentElement;
+
+    if (!parent) return;
+
+    const parentRect = parent.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+
+    let newX = event.pointerPosition.x;
+    let newY = event.pointerPosition.y;
+
+    // Prevent going outside the left and top boundaries
+    if (newX < parentRect.left) {
+      newX = parentRect.left;
+    }
+    if (newY < parentRect.top) {
+      newY = parentRect.top;
+    }
+
+    // Prevent going outside the right and bottom boundaries
+    if (newX + boxRect.width > parentRect.right) {
+      newX = parentRect.right - boxRect.width;
+    }
+    if (newY + boxRect.height > parentRect.bottom) {
+      newY = parentRect.bottom - boxRect.height;
+    }
+
+    box.style.transform = `translate(${newX - parentRect.left}px, ${newY - parentRect.top}px)`;
+  }
+}
